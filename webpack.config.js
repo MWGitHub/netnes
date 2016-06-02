@@ -1,39 +1,36 @@
 var path = require('path');
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var precss = require('precss');
+var autoprefixer = require('autoprefixer');
 
 module.exports = {
-  context: __dirname,
-  entry: ['babel-polyfill' ,'./src/main.js'],
+  entry: ['./lib/main.js'],
   output: {
-    path: __dirname,
-    filename: './build/bundle.js'
-  },
-  resolve: {
-    extensions: ['', '.js']
+    path: path.join(__dirname, 'static'),
+    filename: 'bundle.js'
   },
   module: {
     loaders: [
       {
         test: /\.s?css$/,
-        loader: ExtractTextPlugin.extract('style', 'css!sass')
+        loader: ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader')
       },
       {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
-        loader: 'babel',
-        query: {
-          presets: ['es2015', 'stage-0']
-        }
-      },
-      {
-        test: /\.node$/,
-        loader: 'node-loader'
+        loader: 'babel-loader'
       }
     ]
   },
   plugins: [
-    new ExtractTextPlugin(path.join('build', 'bundle.css'))
+    new ExtractTextPlugin('bundle.css')
   ],
+  postcss: function () {
+    return [
+      precss,
+      autoprefixer
+    ];
+  },
   devtool: 'source-map'
 };
